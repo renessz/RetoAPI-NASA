@@ -1,4 +1,7 @@
+
 ﻿namespace RetoNasaAPI.Modelos
+
+
 {
 
     public class CityData

@@ -2,7 +2,7 @@
 {
 
 
-    public class WeatherModel
+    public class WeatherModelMarine
     {
         public float latitude { get; set; }
         public float longitude { get; set; }

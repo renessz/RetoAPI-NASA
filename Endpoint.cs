@@ -1,9 +1,12 @@
+
 ﻿using RetoNasaAPI;
+
 
 namespace RetoNasaAPI
 {
     public class Endpoint
     {
+
         public static string getGeoApify(string city)
         {
             // return $"https://api.geoapify.com/v1/geocode/search?text=Bilbao&format=json&apiKey=0285c5b0e08f4660904d080a7370cb8c";   
@@ -21,7 +24,14 @@ namespace RetoNasaAPI
 
             return url;
         }
+        public static string GetWeatherEndPoint(float lat, float lon)
+        {
+            var url = $"https://api.open-meteo.com/v1/forecast?latitude={lat}&longitude={lon}&current=temperature_2m,relativehumidity_2m,is_day&hourly=temperature_2m&daily=weathercode,temperature_2m_max,temperature_2m_min,uv_index_max,windspeed_10m_max&timezone=Europe%2FLondon\r\n";
+            return url;
+        }
     }
-
-
 }
+
+    
+
+

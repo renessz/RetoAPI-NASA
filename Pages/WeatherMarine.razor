@@ -68,12 +68,12 @@
 @code {
     string city = "";
     string mensajeerror = "no existe";
-    WeatherModel? weatherData;
+    WeatherModelMarine? weatherData;
     List<string> cities = new List<string>();
     HttpResponseMessage res;
     CityData cityData;
     Boolean existe;
-    HttpClient Client = new HttpClient();
+    HttpClient Client2 = new HttpClient();
     async Task GetWeather()
     {
         cityData = await GetCityData();
@@ -82,7 +82,7 @@
             var latitud = cityData.results[0].lat;
             var longitud = cityData.results[0].lon;
             CultureInfo.DefaultThreadCurrentCulture = new CultureInfo("en-US");
-            weatherData = await Client.GetFromJsonAsync<WeatherModel>(Endpoint.GetWeatherEndPointMarine(latitud, longitud));
+            weatherData = await Client2.GetFromJsonAsync<WeatherModelMarine>(Endpoint.GetWeatherEndPointMarine(latitud, longitud));
             CultureInfo.DefaultThreadCurrentCulture = new CultureInfo("es-es");
             mensajeerror = "";
 
@@ -90,7 +90,7 @@
     }
     async Task<CityData> GetCityData()
     {
-        var ciityData = await Client.GetFromJsonAsync<CityData>(Endpoint.getGeoApify(city));
+        var ciityData = await Client2.GetFromJsonAsync<CityData>(Endpoint.getGeoApify(city));
         return ciityData;
     }
 
@@ -102,7 +102,7 @@
         {
             //res = await Client.GetAsync(Endpoint.GetWeatherEndPoint(num.lat, num.lon));
             CultureInfo.DefaultThreadCurrentCulture = new CultureInfo("en-US");
-            weatherData = await Client.GetFromJsonAsync<WeatherModel>(Endpoint.GetWeatherEndPointMarine(num.lat, num.lon));
+            weatherData = await Client2.GetFromJsonAsync<WeatherModelMarine>(Endpoint.GetWeatherEndPointMarine(num.lat, num.lon));
             CultureInfo.DefaultThreadCurrentCulture = new CultureInfo("es-es");
             mensajeerror = "";
             existe = true;

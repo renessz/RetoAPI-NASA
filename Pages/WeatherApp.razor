@@ -1,0 +1,159 @@
+﻿@page "/weather"
+@using System.Globalization;
+@using RetoNasaAPI.Modelos;
+@using RetoNasaAPI.Modelos.ModelosApp;
+@using RetoNasaAPI.Utilities;
+@using System.Net.Http.Json;
+
+<h3>Weather</h3>
+
+<div class="input-group mb-3 mt-3">
+    <input class="form-control" type="text" @bind=city placeholder="City name" />
+    <div>
+        <button class="btn btn-outline-secondary" @onclick=GetWeather>Search</button>
+    </div>
+</div>
+@if (weatherData != null)
+{
+    <div class="text-center">
+        <p class="display-5">@city</p>
+        <p class="display-1">@weatherData.current.temperature_2m ºC</p>
+        <p class="display-6">@WeatherCode.Convert(@weatherData.daily.weathercode[0])</p>
+        <p class="display-6">Max Wind: @weatherData.daily.windspeed_10m_max[0]</p>
+        @if (weatherData.current.is_day == 0)
+        {
+            <p class="display-5">Es de noche</p>
+        }
+        else
+        {
+            <p class="display-5">Es de día</p>
+        }
+    </div>
+
+    <div class="card-group">
+        @for (int i = 0; i < weatherData.daily.time.Length; i++)
+        {
+            <RetoNasaAPI.Components.WeatherCard Day="@weatherData.daily.time[i]"
+                                                min="@weatherData.daily.temperature_2m_min[i]"
+                                                max="@weatherData.daily.temperature_2m_max[i]"
+                                                uv="@weatherData.daily.uv_index_max[i]"
+                                                summary="@WeatherCode.Convert(@weatherData.daily.weathercode[i])"></RetoNasaAPI.Components.WeatherCard>
+        }
+    </div>
+}
+
+<style>
+    .input-group {
+        margin: 20px auto;
+    }
+
+    .form-control {
+        width: 70%;
+    }
+
+    .btn {
+        background-color: #007BFF;
+        color: #fff;
+    }
+
+        .btn:hover {
+            background-color: #0056b3;
+        }
+
+    .display-5 {
+        font-size: 1.5rem;
+        color: #007BFF;
+    }
+
+    .display-1 {
+        font-size: 3rem;
+        color: #007BFF;
+    }
+
+    .display-6 {
+        font-size: 1rem;
+        color: #333;
+    }
+
+    .card-group {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 20px;
+        margin: 20px auto;
+    }
+</style>
+
+@if (cityData != null && cityData.results.Length > 0)
+{
+
+    <ul>
+        @foreach (Result item in cityData.results)
+        {
+            <button class="btn btn-outline-secondary" @onclick="() => buscar(item)">@item.formatted</button>
+        }
+
+
+
+
+
+    </ul>
+
+}
+
+@if (!string.IsNullOrEmpty(selectedCity))
+{
+    var index = ListaPaises.IndexOf(selectedCity);
+    if (index >= 0 && index < weatherData.daily.time.Length)
+    {
+        <RetoNasaAPI.Components.WeatherCard Day="@weatherData.daily.time[index]"
+                                            min="@weatherData.daily.temperature_2m_min[index]"
+                                            max="@weatherData.daily.temperature_2m_max[index]"
+                                            uv="@weatherData.daily.uv_index_max[index]"
+                                            summary="@WeatherCode.Convert(@weatherData.daily.weathercode[index])">
+        </RetoNasaAPI.Components.WeatherCard>
+    }
+
+}
+
+@code {
+    string city = "";
+    float latitud = 0;
+    float longitud = 0;
+    List<string>? ListaPaises;
+    WeatherModel? weatherData;
+    CityData cityData;
+    string selectedCity = string.Empty;
+    HttpClient Client = new HttpClient();
+
+
+    async Task GetWeather()
+    {
+        cityData = await GetCityData();
+        latitud = cityData.results[0].lat;
+        longitud = cityData.results[0].lon;
+        ListaPaises = new List<string>();
+        for (int i = 0; i < cityData.results.Length; i++)
+        {
+            ListaPaises.Add(cityData.results[i].formatted);
+        }
+        CultureInfo.DefaultThreadCurrentCulture = new CultureInfo("en-US");
+        weatherData = await Client.GetFromJsonAsync<WeatherModel>(Endpoint.GetWeatherEndPoint(latitud, longitud));
+        CultureInfo.DefaultThreadCurrentCulture = new CultureInfo("es-es");
+    }
+    async Task buscar(Result aa)
+    {
+
+        latitud = aa.lat;
+        longitud = aa.lon;
+
+
+        CultureInfo.DefaultThreadCurrentCulture = new CultureInfo("en-US");
+        weatherData = await Client.GetFromJsonAsync<WeatherModel>(Endpoint.GetWeatherEndPoint(latitud, longitud));
+        CultureInfo.DefaultThreadCurrentCulture = new CultureInfo("es-es");
+    }
+    async Task<CityData> GetCityData()
+    {
+        var cityData2 = await Client.GetFromJsonAsync<CityData>(Endpoint.getGeoApify(city));
+        return cityData2;
+    }
+}

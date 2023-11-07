@@ -1,0 +1,26 @@
+﻿<div class="card" style="width: 15rem; background-color: #F5F5F5; border: 1px solid #D3D3D3; border-radius: 10px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);">
+    <div class="text-center">
+        <div class="card-header" style="background-color: #007BFF; color: #fff; font-size: 24px; padding: 10px; border-top-left-radius: 10px; border-top-right-radius: 10px;">@Day</div>
+        <div class="card-body">
+            <h5 class="card-title" style="font-size: 18px; margin: 10px 0; color: #007BFF;">@min ºC / @max ºC</h5>
+            <p class="card-text" style="margin: 5px 0;">@summary</p>
+            <p class="card-text" style="margin: 5px 0; font-weight: bold; color: #007BFF;">UV: @uv</p>
+        </div>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public string Day { get; set; }
+    [Parameter]
+    public float min { get; set; }
+    [Parameter]
+    public float max { get; set; }
+    [Parameter]
+    public string summary { get; set; }
+    [Parameter]
+    public float uv { get; set; }
+    [Parameter]
+    public float Winspeed { get; set; }
+
+}
