@@ -1,0 +1,47 @@
+﻿<div class="card border-dark mb-3" style="max-width: 15rem;">
+    <div class="text-center">
+        <div class="card-header bg-primary text-white">@Day</div> 
+        <div class="card-body">
+            <div class="card-title">Altura de ola maxima: @Alturadeolamaxima</div>
+            <h5 class="card-title">Direccion de la ola dominante :@Direcciondeoladominante</h5>
+            <p class="card-text">Altura maxima de la ola de viento: @Alturamaximadelaoladelviento</p>
+            <p class="card-text">
+                Direccion de la ola del viento dominante: <span class="badge bg-warning">@Direcciondelaoladevientodominante</span>
+            </p>
+            <p class="card-text">periodo De las Olas maxima: @periodoDelasOlasMaxima</p>
+            <p class="card-text">periodo De las Olas Vientos maxima: @periodoDelasOlasVientosMax</p>
+        </div>
+    </div>
+</div>
+
+@code {
+    //Actual
+    [Parameter]
+    public string? Day { get; set; }
+    [Parameter]
+    public float alturaDeOlas{ get; set; }
+    [Parameter]
+    public int direccionDeOlas { get; set; }
+    [Parameter]
+    public float Alturadelaoladeviento { get; set; }
+    [Parameter]
+    public int Direcciondelaoladelviento { get; set; }
+    [Parameter]
+    public float periodoDelasOlas { get; set; }
+    [Parameter]
+    public float periodoDelasOlasVientos { get; set; }
+    //Semanal
+    [Parameter]
+    public float Alturadeolamaxima { get; set; }
+    [Parameter]
+    public int Direcciondeoladominante { get; set; }
+    [Parameter]
+    public float Alturamaximadelaoladelviento { get; set; }
+    [Parameter]
+    public int Direcciondelaoladevientodominante { get; set; }
+    [Parameter]
+    public float periodoDelasOlasMaxima { get; set; }
+    [Parameter]
+    public float periodoDelasOlasVientosMax { get; set; }
+    
+}

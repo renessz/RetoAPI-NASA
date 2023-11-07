@@ -1,0 +1,116 @@
+﻿@page "/weatherMarine"
+@using System.Globalization;
+@using System.Collections.Generic;
+@using System.Net.Http.Json;
+
+
+
+<h3>Weather Marine</h3>
+
+<div class="input-group mb-3 mt-3">
+    <input class="form-control" type="text" @bind=city placeholder="City name" />
+    <div>
+        <button class="btn btn-outline-secondary" @onclick=GetWeather>Search</button>
+    </div>
+</div>
+
+@if (weatherData != null)
+{
+    <div class="text-center">
+        <p class="display-5"> @city</p>
+        <p class="display-2">Altura de las olas: @weatherData.current.wave_height</p>
+        <p class="display-1">Direccion de las olas: @weatherData.current.wave_direction</p>
+        <p class="display-6">Periodo de las olas: @weatherData.current.wave_period</p>
+        <p class="display-6">
+            Periodo de las olas de viento : <span class="badge bg-warning"> :@weatherData.current.wind_wave_period</span>
+        </p>
+        <p class= "display-6">Altura de las olas de viento: @weatherData.current.wind_wave_height</p>
+        <p class ="display-6">Direccion de las olas de viento: @weatherData.current.wind_wave_direction</p>
+
+        @if (cityData != null && cityData.results.Length > 0)
+        {
+            <ul>
+                @foreach (Result cityD in cityData.results)
+                {
+                    <li>
+                        <button class="btn btn-outline-secondary" @onclick="() => GetWeatherbtn(cityD)">@cityD.formatted</button>
+                    </li>
+                }
+            </ul>
+
+        }
+    </div>
+    @if (existe!=false)
+    {
+        <div class="card-group">
+            @for (int i = 0; i < weatherData.daily.time.Length; i++)
+            {
+            <RetoNasaAPI.Components.WeatherCardMarine Day="@weatherData.daily.time[i]"
+                               Alturadeolamaxima="@weatherData.daily.wave_height_max[i]"
+                               Direcciondeoladominante="@weatherData.daily.wave_direction_dominant[i]"
+                               Alturamaximadelaoladelviento="@weatherData.daily.wind_wave_height_max[i]"
+                               Direcciondelaoladevientodominante="@weatherData.daily.wind_wave_direction_dominant[i]"
+                               periodoDelasOlasMaxima="@weatherData.daily.wave_period_max[i]"
+                               periodoDelasOlasVientosMax="@weatherData.daily.wind_wave_period_max[i]">
+
+            </RetoNasaAPI.Components.WeatherCardMarine>
+            }
+        </div>
+    }
+    else
+    {
+        <p>@res</p>
+    <p>@mensajeerror</p>
+    }
+
+}
+
+@code {
+    string city = "";
+    string mensajeerror = "no existe";
+    WeatherModel? weatherData;
+    List<string> cities = new List<string>();
+    HttpResponseMessage res;
+    CityData cityData;
+    Boolean existe;
+    HttpClient Client = new HttpClient();
+    async Task GetWeather()
+    {
+        cityData = await GetCityData();
+        if (cityData != null && cityData.results.Length > 0)
+        {
+            var latitud = cityData.results[0].lat;
+            var longitud = cityData.results[0].lon;
+            CultureInfo.DefaultThreadCurrentCulture = new CultureInfo("en-US");
+            weatherData = await Client.GetFromJsonAsync<WeatherModel>(Endpoint.GetWeatherEndPointMarine(latitud, longitud));
+            CultureInfo.DefaultThreadCurrentCulture = new CultureInfo("es-es");
+            mensajeerror = "";
+
+        }
+    }
+    async Task<CityData> GetCityData()
+    {
+        var ciityData = await Client.GetFromJsonAsync<CityData>(Endpoint.getGeoApify(city));
+        return ciityData;
+    }
+
+
+
+    async Task GetWeatherbtn(Result num)
+    {
+        try
+        {
+            //res = await Client.GetAsync(Endpoint.GetWeatherEndPoint(num.lat, num.lon));
+            CultureInfo.DefaultThreadCurrentCulture = new CultureInfo("en-US");
+            weatherData = await Client.GetFromJsonAsync<WeatherModel>(Endpoint.GetWeatherEndPointMarine(num.lat, num.lon));
+            CultureInfo.DefaultThreadCurrentCulture = new CultureInfo("es-es");
+            mensajeerror = "";
+            existe = true;
+        }
+        catch (Exception)
+        {
+            mensajeerror = "No existe";
+            existe = false;
+        }
+    }
+}
