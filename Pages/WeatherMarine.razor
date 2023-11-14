@@ -64,6 +64,10 @@
     }
 
 }
+else
+{
+    <p>@nocity</p>
+}
 
 @code {
     string city = "";
@@ -73,9 +77,11 @@
     HttpResponseMessage res;
     CityData cityData;
     Boolean existe;
+    string nocity = "";
     HttpClient Client2 = new HttpClient();
     async Task GetWeather()
     {
+        weatherData = null;
         cityData = await GetCityData();
         if (cityData != null && cityData.results.Length > 0)
         {
@@ -87,7 +93,14 @@
             mensajeerror = "";
 
         }
+        else
+        {
+            // City not found
+            nocity = "ciudad no encontrada";
+        }
+
     }
+
     async Task<CityData> GetCityData()
     {
         var ciityData = await Client2.GetFromJsonAsync<CityData>(Endpoint.getGeoApify(city));

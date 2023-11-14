@@ -133,6 +133,7 @@
         weatherDataAir = await Client.GetFromJsonAsync<WeatherModelAir>(Endpoint.GetWeatherEndPointAir(latitud, longitud));
         CultureInfo.DefaultThreadCurrentCulture = new CultureInfo("es-es");
     }
+
     async Task buscar(Result aa)
     {
         latitud = aa.lat;

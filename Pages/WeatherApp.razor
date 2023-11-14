@@ -72,6 +72,7 @@
 
     async Task GetWeather()
     {
+        weatherData = null;
         cityData = await GetCityData();
 
         if (cityData != null && cityData.results.Length > 0)
