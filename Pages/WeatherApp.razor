@@ -26,32 +26,38 @@
 
 @if (weatherData != null)
 {
-    <div class="text-center">
-        <p class="display-5">@city</p>
-        <p class="display-1">@weatherData.current.temperature_2m ºC</p>
-        <p class="display-6">@WeatherCode.Convert(@weatherData.daily.weathercode[0])</p>
-        <p class="display-6">Max Wind: @weatherData.daily.windspeed_10m_max[0]</p>
-        @if (weatherData.current.is_day == 0)
-        {
-            <p class="display-5">Es de noche</p>
-        }
-        else
-        {
-            <p class="display-5">Es de día</p>
-        }
-    </div>
+  
+        <div class="text-center">
+            <p class="display-5">@city</p>
+            <p class="display-1">@weatherData.current.temperature_2m ºC</p>
+            <p class="display-6">@WeatherCode.Convert(@weatherData.daily.weathercode[0])</p>
+            <p class="display-6">Max Wind: @weatherData.daily.windspeed_10m_max[0]</p>
+            @if (weatherData.current.is_day == 0)
+            {
+                <p class="display-5">Es de noche</p>
+            }
+            else
+            {
+                <p class="display-5">Es de día</p>
+            }
+        </div>
 
-    <div class="card-group">
-        @for (int i = 0; i < weatherData.daily.time.Length; i++)
-        {
-            <RetoNasaAPI.Components.WeatherCard Day="@weatherData.daily.time[i]"
-                                                min="@weatherData.daily.temperature_2m_min[i]"
-                                                max="@weatherData.daily.temperature_2m_max[i]"
-                                                uv="@weatherData.daily.uv_index_max[i]"
-                                                summary="@WeatherCode.Convert(@weatherData.daily.weathercode[i])"></RetoNasaAPI.Components.WeatherCard>
-        }
-    </div>
-}
+        <div class="card-group">
+            @for (int i = 0; i < weatherData.daily.time.Length; i++)
+            {
+                <RetoNasaAPI.Components.WeatherCard Day="@weatherData.daily.time[i]"
+                                                    min="@weatherData.daily.temperature_2m_min[i]"
+                                                    max="@weatherData.daily.temperature_2m_max[i]"
+                                                    uv="@weatherData.daily.uv_index_max[i]"
+                                                    summary="@WeatherCode.Convert(@weatherData.daily.weathercode[i])"></RetoNasaAPI.Components.WeatherCard>
+            }
+        </div>
+    
+    
+}else
+    {
+        <p>@nocity</p>
+    }
 
 @code {
     string city = "";
@@ -61,21 +67,31 @@
     WeatherModel? weatherData;
     CityData cityData;
     string selectedCity = string.Empty;
+    string nocity = "";
     HttpClient Client = new HttpClient();
 
     async Task GetWeather()
     {
         cityData = await GetCityData();
-        latitud = cityData.results[0].lat;
-        longitud = cityData.results[0].lon;
-        ListaPaises = new List<string>();
-        for (int i = 0; i < cityData.results.Length; i++)
+
+        if (cityData != null && cityData.results.Length > 0)
         {
-            ListaPaises.Add(cityData.results[i].formatted);
+            latitud = cityData.results[0].lat;
+            longitud = cityData.results[0].lon;
+            ListaPaises = new List<string>();
+            for (int i = 0; i < cityData.results.Length; i++)
+            {
+                ListaPaises.Add(cityData.results[i].formatted);
+            }
+            CultureInfo.DefaultThreadCurrentCulture = new CultureInfo("en-US");
+            weatherData = await Client.GetFromJsonAsync<WeatherModel>(Endpoint.GetWeatherEndPoint(latitud, longitud));
+            CultureInfo.DefaultThreadCurrentCulture = new CultureInfo("es-es");
         }
-        CultureInfo.DefaultThreadCurrentCulture = new CultureInfo("en-US");
-        weatherData = await Client.GetFromJsonAsync<WeatherModel>(Endpoint.GetWeatherEndPoint(latitud, longitud));
-        CultureInfo.DefaultThreadCurrentCulture = new CultureInfo("es-es");
+        else
+        {
+            // City not found
+            nocity = "ciudad no encontrada";
+        }
     }
 
     async Task buscar(Result aa)
