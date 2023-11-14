@@ -2,8 +2,6 @@
 @using System.Globalization;
 @using System.Collections.Generic;
 @using System.Net.Http.Json;
-@inject IJSRuntime JSRuntime
-
 
 
 
@@ -62,7 +60,7 @@
     else
     {
         <p>@res</p>
-    <p class="text-danger">@mensajeerror</p>
+    <p>@mensajeerror</p>
     }
 
 }
@@ -79,50 +77,23 @@
     async Task GetWeather()
     {
         cityData = await GetCityData();
-
         if (cityData != null && cityData.results.Length > 0)
         {
             var latitud = cityData.results[0].lat;
             var longitud = cityData.results[0].lon;
+            CultureInfo.DefaultThreadCurrentCulture = new CultureInfo("en-US");
+            weatherData = await Client2.GetFromJsonAsync<WeatherModelMarine>(Endpoint.GetWeatherEndPointMarine(latitud, longitud));
+            CultureInfo.DefaultThreadCurrentCulture = new CultureInfo("es-es");
+            mensajeerror = "";
 
-            try
-            {
-                CultureInfo.DefaultThreadCurrentCulture = new CultureInfo("en-US");
-                weatherData = await Client2.GetFromJsonAsync<WeatherModelMarine>(Endpoint.GetWeatherEndPointMarine(latitud, longitud));
-                CultureInfo.DefaultThreadCurrentCulture = new CultureInfo("es-es");
-                mensajeerror = "";
-                existe = true;
-            }
-            catch (Exception)
-            {
-                mensajeerror = "Error retrieving weather data.";
-                existe = false;
-
-                // Show error popup using JavaScript interop
-                await ShowErrorPopup();
-            }
-        }
-        else
-        {
-            mensajeerror = "City not found.";
-            existe = false;
-
-            // Show error popup using JavaScript interop
-            await ShowErrorPopup();
         }
     }
-
     async Task<CityData> GetCityData()
     {
         var ciityData = await Client2.GetFromJsonAsync<CityData>(Endpoint.getGeoApify(city));
         return ciityData;
     }
 
-    async Task ShowErrorPopup()
-    {
-        // Use JavaScript interop to show a popup
-        await JSRuntime.InvokeVoidAsync("alert", mensajeerror);
-    }
 
 
     async Task GetWeatherbtn(Result num)
