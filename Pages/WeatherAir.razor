@@ -1,0 +1,151 @@
+﻿@page "/air"
+@using System.Globalization;
+@using RetoNasaAPI.Modelos;
+@using RetoNasaAPI.Modelos.ModelosApp;
+@using RetoNasaAPI.Utilities;
+@using System.Net.Http.Json;
+
+<h3>Weather</h3>
+
+<div class="input-group mb-3 mt-3">
+    <input class="form-control" type="text" @bind=city placeholder="City name" />
+    <div>
+        <button class="btn btn-outline-secondary" @onclick=GetWeatherAir>Search</button>
+    </div>
+</div>
+@if (weatherDataAir != null)
+{
+    <div class="text-center">
+        <p class="display-5">@city</p>
+        <p class="display-1">@weatherDataAir.hourly.time[0]</p>
+        <p class="display-6">@weatherDataAir.timezone</p>
+
+
+    </div>
+
+    
+}
+
+<style>
+    .input-group {
+        margin: 20px auto;
+    }
+
+    .form-control {
+        width: 70%;
+    }
+
+    .btn {
+        background-color: #007BFF;
+        color: #fff;
+    }
+
+        .btn:hover {
+            background-color: #0056b3;
+        }
+
+    .display-5 {
+        font-size: 1.5rem;
+        color: #007BFF;
+    }
+
+    .display-1 {
+        font-size: 3rem;
+        color: #007BFF;
+    }
+
+    .display-6 {
+        font-size: 1rem;
+        color: #333;
+    }
+
+    .card-group {
+        display: grid;
+        grid-template-columns: repeat(5, 1fr); /* Muestra 5 tarjetas por fila */
+        gap: 20px;
+        margin: 20px auto;
+    }
+</style>
+
+@if (cityData != null && cityData.results.Length > 0)
+{
+
+    <ul>
+        @foreach (Result item in cityData.results)
+        {
+            <button class="btn btn-outline-secondary" @onclick="() => buscar(item)">@item.formatted</button>
+        }
+
+
+
+
+
+    </ul>
+
+}
+
+@if (!string.IsNullOrEmpty(selectedCity))
+{
+    // Obtén el índice de la ciudad seleccionada
+    var index = ListaPaises.IndexOf(selectedCity);
+
+    if (index >= 0 && index < weatherDataAir.hourly.time.Length)
+    {
+        <div class="card-group">
+            @for (int i = 0; i < Math.Min(weatherDataAir.hourly.time.Length, 24); i++)
+            {
+               
+                <RetoNasaAPI.Components.WeatherCardAir Hora="@weatherDataAir.hourly.time[i]"
+                                                       Intervalo="@weatherDataAir.current.interval"
+                                                       ÍndiceAireEuropeo="@weatherDataAir.current.us_aqi"
+                                                       ÍndiceAireEEUU="@weatherDataAir.current.european_aqi"
+                                                       MonóxidoCarbono="@weatherDataAir.current.carbon_monoxide"
+                                                       DióxidoNitrógeno="@weatherDataAir.current.nitrogen_dioxide"
+                                                       ÍndiceUV="@weatherDataAir.current.uv_index"></RetoNasaAPI.Components.WeatherCardAir>
+            }
+        </div>
+    }
+}
+
+
+@code {
+    string city = "";
+    float latitud = 0;
+    float longitud = 0;
+    List<string>? ListaPaises;
+    WeatherModelAir? weatherDataAir;
+    CityData cityData;
+    string selectedCity = string.Empty;
+    HttpClient Client = new HttpClient();
+
+
+    async Task GetWeatherAir()
+    {
+        cityData = await GetCityData();
+        latitud = cityData.results[0].lat;
+        longitud = cityData.results[0].lon;
+        ListaPaises = new List<string>();
+        for (int i = 0; i < cityData.results.Length; i++)
+        {
+            ListaPaises.Add(cityData.results[i].formatted);
+        }
+        CultureInfo.DefaultThreadCurrentCulture = new CultureInfo("en-US");
+        weatherDataAir = await Client.GetFromJsonAsync<WeatherModelAir>(Endpoint.GetWeatherEndPointAir(latitud, longitud));
+        CultureInfo.DefaultThreadCurrentCulture = new CultureInfo("es-es");
+    }
+    async Task buscar(Result aa)
+    {
+        latitud = aa.lat;
+        longitud = aa.lon;
+        selectedCity = aa.formatted; // Asegúrate de actualizar selectedCity aquí.
+        Console.WriteLine(selectedCity); // Agrega esta línea para depurar.
+        CultureInfo.DefaultThreadCurrentCulture = new CultureInfo("en-US");
+        weatherDataAir = await Client.GetFromJsonAsync<WeatherModelAir>(Endpoint.GetWeatherEndPointAir(latitud, longitud));
+        CultureInfo.DefaultThreadCurrentCulture = new CultureInfo("es-es");
+    }
+    async Task<CityData> GetCityData()
+    {
+        var cityData2 = await Client.GetFromJsonAsync<CityData>(Endpoint.getGeoApify(city));
+        return cityData2;
+    }
+}
