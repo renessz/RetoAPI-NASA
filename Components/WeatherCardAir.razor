@@ -1,44 +1,34 @@
-﻿
-
-
-<div class="card border-dark mb-3" style="max-width: 15rem;">
+﻿<div class="card border-dark mb-3" style="max-width: 15rem;">
     <div class="text-center">
         <div class="card-header bg-primary text-white">@Hora</div>
 
         <div class="card-body">
-            <div class="card-title">Intervalo: @Intervalo</div>
-            <h5 class="card-title">Índice Aire Europeo :@ÍndiceAireEuropeo</h5>
-            <p class="card-text">Índice Aire EEUU: @ÍndiceAireEEUU</p>
-            <p class="card-text">
-                PM10: <span class="badge bg-warning">@PM10</span>
-            </p>
-            <p class="card-text">PM2_5: @PM2_5</p>
-            <p class="card-text">MonóxidoCarbono: @MonóxidoCarbono</p>
-            <p class="card-text">DióxidoNitrógeno: @DióxidoNitrógeno</p>
-            <p class="card-text">ÍndiceUV: @ÍndiceUV</p>
+            <div class="card-title">Polvo: @Dust</div>
+            <h5 class="card-title">Ozono: @Ozone</h5>
+            <p class="card-text">PM10: @PM10</p>
+            <p class="card-text">PM2.5: @PM2_5</p>
+            <p class="card-text">Monóxido de Carbono: @CarbonMonoxide</p>
+            <p class="card-text">Dióxido de Nitrógeno: @NitrogenDioxide</p>
+            <p class="card-text">Índice UV: @UVIndex</p>
         </div>
     </div>
 </div>
+
 @code {
-
-
     [Parameter]
     public string Hora { get; set; }
-    [Parameter]
-    public int Intervalo { get; set; }
-    [Parameter]
-    public int ÍndiceAireEuropeo { get; set; }
-    [Parameter]
-    public int ÍndiceAireEEUU { get; set; }
     [Parameter]
     public float? PM10 { get; set; }
     [Parameter]
     public float? PM2_5 { get; set; }
     [Parameter]
-    public float MonóxidoCarbono { get; set; }
+    public float? CarbonMonoxide { get; set; }
     [Parameter]
-    public float DióxidoNitrógeno { get; set; }
+    public float? NitrogenDioxide { get; set; }
     [Parameter]
-    public float ÍndiceUV { get; set; }
-
+    public float? Ozone { get; set; }
+    [Parameter]
+    public float? Dust { get; set; }
+    [Parameter]
+    public float? UVIndex { get; set; }
 }
